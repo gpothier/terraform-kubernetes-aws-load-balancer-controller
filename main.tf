@@ -410,20 +410,40 @@ resource "helm_release" "alb_controller" {
   namespace  = var.k8s_namespace
   atomic     = true
   timeout    = 900
-  dynamic "set" {
-    for_each = {
-      "clusterName"           = var.k8s_cluster_name
-      "serviceAccount.create" = (var.k8s_cluster_type != "eks")
-      "serviceAccount.name"   = (var.k8s_cluster_type == "eks") ? kubernetes_service_account.this.metadata[0].name : null
-      "region"                = local.aws_region_name
-      "vpcId"                 = local.aws_vpc_id
-      "hostNetwork"           = var.enable_host_networking
-    }
-    content {
-      name  = set.key
-      value = set.value
-      type  = "string"
-    }
+
+  set {
+    name  = "clusterName"
+    value = var.k8s_cluster_name
+    type  = "string"
+  }
+
+  set {
+    name  = "serviceAccount.create"
+    value = var.k8s_cluster_type != "eks"
+  }
+
+  set {
+    name  = "serviceAccount.name"
+    value = (var.k8s_cluster_type == "eks") ? kubernetes_service_account.this.metadata[0].name : null
+    type  = "string"
+  }
+
+  set {
+    name  = "region"
+    value = local.aws_region_name
+    type  = "string"
+  }
+
+  set {
+    name  = "vpcId"
+    value = local.aws_vpc_id
+    type  = "string"
+  }
+
+  set {
+    name  = "hostNetwork"
+    value = var.enable_host_networking
+    type  = "string"
   }
 
   depends_on = [var.alb_controller_depends_on]
