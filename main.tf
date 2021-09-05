@@ -422,6 +422,7 @@ resource "helm_release" "alb_controller" {
     content {
       name  = set.key
       value = set.value
+      type  = "string"
     }
   }
 
